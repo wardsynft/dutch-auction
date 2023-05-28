@@ -743,10 +743,10 @@
         }
       }
     },
-    "src/Counter.sol": {
-      "lastModificationDate": 1684667732528,
-      "contentHash": "22b3b196fa914b8ce7442b72f1a1d0f5",
-      "sourceName": "src/Counter.sol",
+    "lib/openzeppelin-contracts/contracts/security/ReentrancyGuard.sol": {
+      "lastModificationDate": 1685264227912,
+      "contentHash": "ee1cd296e049da9a26bdb08e23a9036a",
+      "sourceName": "lib/openzeppelin-contracts/contracts/security/ReentrancyGuard.sol",
       "solcConfig": {
         "settings": {
           "optimizer": {
@@ -776,17 +776,59 @@
         }
       },
       "imports": [],
-      "versionRequirement": "=0.8.17",
+      "versionRequirement": "^0.8.0",
       "artifacts": {
-        "Counter": {
-          "0.8.17+commit.8df45f5f.Darwin.appleclang": "Counter.sol/Counter.json"
+        "ReentrancyGuard": {
+          "0.8.17+commit.8df45f5f.Darwin.appleclang": "ReentrancyGuard.sol/ReentrancyGuard.json"
         }
       }
     },
-    "test/Counter.t.sol": {
-      "lastModificationDate": 1684667740402,
-      "contentHash": "5f8f551f551b9de4801c5cca6749b059",
-      "sourceName": "test/Counter.t.sol",
+    "src/DutchAuction.sol": {
+      "lastModificationDate": 1685266833164,
+      "contentHash": "6bd7a43662b99054663a55f64488b0ae",
+      "sourceName": "src/DutchAuction.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "paris",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "lib/openzeppelin-contracts/contracts/security/ReentrancyGuard.sol"
+      ],
+      "versionRequirement": "=0.8.17",
+      "artifacts": {
+        "DutchAuction": {
+          "0.8.17+commit.8df45f5f.Darwin.appleclang": "DutchAuction.sol/DutchAuction.json"
+        }
+      }
+    },
+    "test/DutchAuction.T.sol": {
+      "lastModificationDate": 1685267148883,
+      "contentHash": "426c200648c5f5c325d03d796c6c37c6",
+      "sourceName": "test/DutchAuction.T.sol",
       "solcConfig": {
         "settings": {
           "optimizer": {
@@ -833,12 +875,57 @@
         "lib/forge-std/src/console.sol",
         "lib/forge-std/src/console2.sol",
         "lib/forge-std/src/interfaces/IMulticall3.sol",
-        "src/Counter.sol"
+        "lib/openzeppelin-contracts/contracts/security/ReentrancyGuard.sol",
+        "src/DutchAuction.sol",
+        "test/mocks/MockDutchAuction.sol"
       ],
       "versionRequirement": "=0.8.17",
       "artifacts": {
-        "CounterTest": {
-          "0.8.17+commit.8df45f5f.Darwin.appleclang": "Counter.t.sol/CounterTest.json"
+        "DutchAuctionTest": {
+          "0.8.17+commit.8df45f5f.Darwin.appleclang": "DutchAuction.T.sol/DutchAuctionTest.json"
+        }
+      }
+    },
+    "test/mocks/MockDutchAuction.sol": {
+      "lastModificationDate": 1685267170731,
+      "contentHash": "b53b87960d075b02657cfc0f58aeaaa1",
+      "sourceName": "test/mocks/MockDutchAuction.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "paris",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "lib/openzeppelin-contracts/contracts/security/ReentrancyGuard.sol",
+        "src/DutchAuction.sol"
+      ],
+      "versionRequirement": "^0.8.17",
+      "artifacts": {
+        "MockDutchAuction": {
+          "0.8.17+commit.8df45f5f.Darwin.appleclang": "MockDutchAuction.sol/MockDutchAuction.json"
         }
       }
     }

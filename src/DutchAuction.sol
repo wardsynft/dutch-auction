@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-abstract contract DutchAuction {
+abstract contract DutchAuction is ReentrancyGuard {
 
     error AuctionNotStarted();
     error MaximumPerTransactionExceeded();
@@ -13,6 +13,9 @@ abstract contract DutchAuction {
     error BidsAlreadyRefunded();
     error NoRefundRequired();
     error FailedToRefundBids();
+    error AlreadyWithdrawn();
+    error AuctionInProgress();
+    error UnableToWithdraw();
 
     event BidPlaced(
         address indexed from,
@@ -39,15 +42,17 @@ abstract contract DutchAuction {
         uint256 interval;
         uint256 mintable; // @dev total number of mintable tokens during DA
         uint256 maxPerTx;
-        uint256 finalPrice; // @dev the final price of the last sold item
     }
 
-    AuctionConfig public auctionConfig;
-    address payable recipient;
+    address payable recipient;  
     bool public allowRefunds;
+    bool public fundsWithdrawn;
+    AuctionConfig public auctionConfig;
     uint256 public totalMinted;
+    uint256 finalPrice;
     mapping(address => Bid[]) public bids;
     mapping(address => bool) public bidsRefunded;
+    
 
     constructor(
         AuctionConfig memory _auctionConfig,
@@ -82,7 +87,7 @@ abstract contract DutchAuction {
         }
 
         if (totalMinted + amount == config.mintable) {
-            config.finalPrice = price;
+            finalPrice = price;
         }
 
         totalMinted += amount;
@@ -91,6 +96,8 @@ abstract contract DutchAuction {
         emit BidPlaced(from, amount, price);
     }
 
+    // @dev will delegate the functionality of handling a bid to the contract
+    // inheriting this.
     function _delegateBid(
         address from,
         uint256 amount,
@@ -116,7 +123,6 @@ abstract contract DutchAuction {
         allowRefunds = _allowRefunds;
     }
 
-    // Make nonReentrant
     function claimRefund() external {
         if (!allowRefunds) {
             revert RefundsDisabled();
@@ -130,7 +136,7 @@ abstract contract DutchAuction {
         uint256 refundAmount = 0;
         for (uint i = 0; i < senderBids.length; i++) {
             Bid memory bid = senderBids[i];
-            refundAmount += (bid.price - auctionConfig.finalPrice) * bid.amount; // @dev check for negatives
+            refundAmount += (bid.price - finalPrice) * bid.amount; // @dev check for negatives
         }
         bidsRefunded[msg.sender] = true;
         if (refundAmount == 0) {
@@ -143,9 +149,29 @@ abstract contract DutchAuction {
         }
     }
 
+    function withdraw() internal nonReentrant {
+        if (fundsWithdrawn) {
+            revert AlreadyWithdrawn();
+        }
+
+        if (finalPrice == 0) {
+            revert AuctionInProgress();
+        }
+        uint256 withdrawAmount = totalMinted * finalPrice;
+        fundsWithdrawn = true;
+        (bool success, ) =  recipient.call{value: withdrawAmount}("");
+        if (!success) {
+            revert UnableToWithdraw();
+        }
+    }
+
     // @dev this method will calculate the reduction in cost per step.
     function _getPriceReductionPerStep() internal view returns (uint256) {
         return (auctionConfig.startPrice - auctionConfig.endPrice) / 
             (auctionConfig.duration / auctionConfig.interval);
+    }
+
+    function _getBidsFromAddress(address from) external view returns (Bid[] memory) {
+        return bids[from];
     }
 }
